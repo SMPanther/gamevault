@@ -162,7 +162,7 @@ export default function Market({ sg, eg, sLinked, eLinked, sProf, eProf, setNoti
         steam:sLinked, epic:eLinked, steamVal:sv, epicVal:ev,
         askPrice:+sellForm.askPrice, level:sProf.level, badges:sProf.badges,
         games:sg.length+eg.length, rating:5.0, reviews:0,
-        verified: USER_DB[user?.username]?.steamVerified || false,
+        verified: user?.steamVerified || false,
         note:sellForm.note, isOwn:true, offers:[],
         contacts:[],    // buyers who clicked "contact"
       },...p]);

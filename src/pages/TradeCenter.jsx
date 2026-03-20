@@ -368,7 +368,7 @@ export default function TradeCenter({ sg, eg, user, setNotify }) {
               Any proposals received will also be removed.
             </div>
             <div style={{ display:"flex", gap:10 }}>
-              <button className="btn o" style={{ flex:1 }} onClick={()=>{
+              <button className="btn o" style={{ flex:1 }} onClick={async ()=>{
                 await sbDeleteTrade(confirmDel);
                 sbGetTrades().then(data => setTrades(data || []));
                 setConfirmDel(null);
