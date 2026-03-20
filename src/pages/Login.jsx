@@ -99,7 +99,7 @@ export default function Login({ onLogin }) {
     setOtpSent(false); setOtpValue(""); setOtpErr("");
     const valid = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(val.trim());
     if (!valid) { setEmailStatus(null); return; }
-    if (emailTaken(val)) { setEmailStatus("taken"); return; }
+    // Duplicate email check happens at Supabase register time
     setEmailStatus("ok");
   };
 
