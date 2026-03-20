@@ -207,11 +207,6 @@ export default function Market({ sg, eg, sLinked, eLinked, sProf, eProf, setNoti
     // Show contact modal with seller details
     setContactModal(listing);
   };
-    <span style={{color:"var(--orange)",fontSize:12}}>
-      {"★".repeat(Math.round(n))}{"☆".repeat(5-Math.round(n))}
-    </span>
-  );
-
   // ── If viewing detail page ──────────────────────────────────────────────────
   if (detailListing) {
     // Keep modals rendered even inside detail view — they mount at this level
