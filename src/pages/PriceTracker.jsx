@@ -7,12 +7,28 @@ import { lsGet, lsSet } from "../utils/storage";
 // Uses Steam Store API to get current price, stores history in localStorage
 // ─────────────────────────────────────────────────────────────────────────────
 
-const PROXY = "https://corsproxy.io/?";
+// Multiple CORS proxies — tries each one in order
+const PROXIES = [
+  "https://corsproxy.io/?",
+  "https://api.allorigins.win/raw?url=",
+  "https://thingproxy.freeboard.io/fetch/",
+];
+
+async function fetchWithProxy(url, timeout = 8000) {
+  for (const proxy of PROXIES) {
+    try {
+      const res = await fetch(proxy + encodeURIComponent(url), {
+        signal: AbortSignal.timeout(timeout),
+      });
+      if (res.ok) return res;
+    } catch {}
+  }
+  throw new Error("All proxies failed");
+}
 
 async function fetchSteamPrice(appId) {
   const url = `https://store.steampowered.com/api/appdetails?appids=${appId}&filters=price_overview&cc=us`;
-  const res  = await fetch(PROXY + encodeURIComponent(url), { signal: AbortSignal.timeout(8000) });
-  if (!res.ok) throw new Error("Failed");
+  const res  = await fetchWithProxy(url);
   const data = await res.json();
   const info = data?.[String(appId)]?.data?.price_overview;
   if (!info) return null;
@@ -26,14 +42,15 @@ async function fetchSteamPrice(appId) {
 
 async function searchSteamGame(query) {
   const url = `https://store.steampowered.com/api/storesearch/?term=${encodeURIComponent(query)}&l=en&cc=US`;
-  const res  = await fetch(PROXY + encodeURIComponent(url), { signal: AbortSignal.timeout(6000) });
-  if (!res.ok) return [];
-  const data = await res.json();
-  return (data?.items || []).slice(0, 5).map(g => ({
-    appid: g.id,
-    name:  g.name,
-    img:   `https://cdn.cloudflare.steamstatic.com/steam/apps/${g.id}/header.jpg`,
-  }));
+  try {
+    const res  = await fetchWithProxy(url, 6000);
+    const data = await res.json();
+    return (data?.items || []).slice(0, 5).map(g => ({
+      appid: g.id,
+      name:  g.name,
+      img:   `https://cdn.cloudflare.steamstatic.com/steam/apps/${g.id}/header.jpg`,
+    }));
+  } catch { return []; }
 }
 
 function sparkPoints(history) {
@@ -67,8 +84,11 @@ export default function PriceTracker({ sg = [] }) {
   const doSearch = async () => {
     if (!search.trim()) return;
     setSearching(true); setResults([]);
-    try { setResults(await searchSteamGame(search)); }
-    catch { setResults([]); }
+    try {
+      const r = await searchSteamGame(search);
+      setResults(r);
+      if (!r.length) setErr("No games found — try a different name");
+    } catch (e) { setErr("Search failed — check your connection"); setResults([]); }
     setSearching(false);
   };
 

@@ -12,6 +12,7 @@ import TradeCenter    from "./pages/TradeCenter";
 import OwnerDashboard from "./pages/OwnerDashboard";
 import Onboarding     from "./pages/Onboarding";
 import PriceTracker   from "./pages/PriceTracker";
+import AIAssistant    from "./pages/AIAssistant";
 import ActivityLog    from "./pages/ActivityLog";
 import { USER_DB }    from "./constants/auth";
 import { logActivity } from "./utils/storage";
@@ -50,7 +51,7 @@ function VideoBg({ videoId, enabled }) {
   );
 }
 
-const TAB_ORDER = ["dashboard","library","wishlist","accounts","market","trades","prices","activity"];
+const TAB_ORDER = ["dashboard","library","wishlist","accounts","market","trades","prices","activity","ai"];
 
 const freshUserState = () => ({
   tab:        "dashboard",
@@ -297,6 +298,10 @@ export default function App() {
               )}
               {tab === "activity" && (
                 <ActivityLog user={mergedUser} />
+              )}
+              {tab === "ai" && (
+                <AIAssistant sg={sg} eg={eg} sLinked={sLinked} eLinked={eLinked}
+                  sProf={sProf} eProf={eProf} setNotify={setNotify} />
               )}
             </div>
           </>

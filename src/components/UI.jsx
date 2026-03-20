@@ -397,6 +397,7 @@ export function Nav({ user, active, setActive, onLogout, theme, toggleTheme, onU
     { id:"market",    label:"Market",    icon:"⟳" },
     { id:"trades",    label:"Trades",    icon:"🔄" },
     { id:"prices",    label:"Prices",    icon:"💰" },
+    { id:"ai",        label:"AI",         icon:"🤖" },
   ];
   return (
     <>
