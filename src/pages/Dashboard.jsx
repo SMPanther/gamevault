@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { BarChart, PieChart, AnimCounter, Sparkline } from "../components/Charts";
-import { fmt, calcSteam, calcEpic, getGenreSlices, getPlaytimeByMonth } from "../utils/helpers";
+import { BarChart, PieChart, AnimCounter } from "../components/Charts";
+import { calcSteam, calcEpic, getGenreSlices, getPlaytimeByMonth } from "../utils/helpers";
 import { VAL_METHODS } from "../constants/data";
 import { NEWS_DB, FREE_GAMES_DB } from "../constants/ownerData";
 import PlaytimeHeatmap from "../components/PlaytimeHeatmap";

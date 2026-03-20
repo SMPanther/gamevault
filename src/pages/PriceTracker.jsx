@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { fmt } from "../utils/helpers";
 import { lsGet, lsSet } from "../utils/storage";
 

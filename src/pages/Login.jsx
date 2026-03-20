@@ -1,6 +1,6 @@
 import { useState, useRef } from "react";
 import { pwStr } from "../utils/helpers";
-import { sbRegister, sbLogin, sbGetProfile, sbCheckUsername, supabase } from "../utils/supabase";
+import { sbRegister, sbLogin, sbGetProfile, sbCheckUsername } from "../utils/supabase";
 import { resetPassword } from "../constants/auth";
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -66,7 +66,7 @@ export default function Login({ onLogin }) {
 
   // OTP state
   const [otpSending,  setOtpSending]  = useState(false);
-  const [otpSent,     setOtpSent]     = useState(false);
+  const [, setOtpSent]     = useState(false);
   const [otpValue,    setOtpValue]    = useState(""); // what user types
   const [otpSecret,   setOtpSecret]   = useState(""); // what we generated
   const [otpExpiry,   setOtpExpiry]   = useState(null); // timestamp

@@ -9,7 +9,6 @@
 
 const PROXY   = "https://corsproxy.io/?";
 const STEAM   = "https://api.steampowered.com";
-const STORE   = "https://store.steampowered.com";
 
 function proxied(url) {
   return `${PROXY}${encodeURIComponent(url)}`;
@@ -110,9 +109,7 @@ const KNOWN_EMOJIS = {
   70:     "🥽", // HL1 (proxy for Alyx)
   1145360:"🥽", // HL: Alyx
   292030: "🗡️", // Witcher 3
-  1145360:"🥽",
   1659040:"💀", // Hades 2
-  1145360:"🥽",
 };
 
 export function gameEmoji(appId) {

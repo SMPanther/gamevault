@@ -13,7 +13,7 @@ const GAME_EMOJIS  = ["🎮","⚔️","🔫","🚗","🌆","🧙","🎯","🚀",
 
 export default function OwnerDashboard({ owner, onLogout, setGlobalNotify, onDataChange }) {
   const [tab, setTab] = useState("analytics");
-  const [tick, setTick] = useState(0);
+  const [, setTick] = useState(0);
   const refresh = () => setTick(t => t + 1);
   useEffect(() => { recordVisit(); }, []); // log each owner dashboard session
 

@@ -5,8 +5,8 @@ import { pushNotif, markAllRead, clearAll, subscribeNotifs, getNotifs } from "..
 
 // ─── Notification Toast ───────────────────────────────────────────────────────
 export function Notif({ msg, type, onClose }) {
-  useEffect(() => { const t = setTimeout(onClose, 3800); return () => clearTimeout(t); }, []);
-  useEffect(() => { pushNotif({ msg, type }); }, []);
+  useEffect(() => { const t = setTimeout(onClose, 3800); return () => clearTimeout(t); }, [onClose]);
+  useEffect(() => { pushNotif({ msg, type }); }, [msg, type]);
   return (
     <div className={`notif${type === "error" ? " err" : ""}`}>
       <span style={{ color: type === "error" ? "var(--orange)" : "var(--green)", marginRight: 8 }}>
@@ -38,6 +38,7 @@ export function LoadingScreen({ onDone }) {
       if (p >= 100) { clearInterval(timer); setTimeout(onDone, 400); }
     }, 28);
     return () => clearInterval(timer);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   return (
     <div className="loading-screen">
@@ -164,7 +165,6 @@ function ProfileMenu({ user, onLogout, setActive, onUserUpdate }) {
   const ref      = useRef(null);
   const panelRef = useRef(null);  // ref for the portalled dropdown panel
 
-  const AVATARS = ["🎮","👾","🤖","👻","🦊","🐉","🦁","🐺","🌌","⚔️","🛸","🧬","🔥","💀","🎯","🕹️","🏆","⚡","🌀","🎲"];
 
   const pickAvatar = (emoji) => {
     const u = USER_DB[user.username?.toLowerCase()];

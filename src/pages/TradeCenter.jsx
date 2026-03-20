@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { fmt } from "../utils/helpers";
+
 import { sbGetTrades, sbUpsertTrade, sbDeleteTrade, sbUpdateTradeProposals, subscribeTrades } from "../utils/supabase";
 
 function useTradeStore() {
@@ -34,8 +34,8 @@ export default function TradeCenter({ sg, eg, user, setNotify }) {
     .filter(t => t.owner_id !== user?.id && t.status === "open")
     .filter(t => filterPlat === "all" || t.platform === filterPlat)
     .filter(t => !searchQuery.trim() ||
-      t.offer_game||t.offerGame.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      t.want_game||t.wantGame.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (t.offer_game||t.offerGame).toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (t.want_game||t.wantGame).toLowerCase().includes(searchQuery.toLowerCase()) ||
       t.seller.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
@@ -160,14 +160,14 @@ export default function TradeCenter({ sg, eg, user, setNotify }) {
                   <div style={{ display:"grid", gridTemplateColumns:"1fr auto 1fr", gap:6, alignItems:"center", marginBottom:12 }}>
                     <div style={{ background:"rgba(191,0,255,0.07)", border:"1px solid rgba(191,0,255,0.2)", padding:10, textAlign:"center" }}>
                       <div className="mono" style={{ fontSize:8, color:"var(--purple)", letterSpacing:1, marginBottom:4 }}>OFFERING</div>
-                      <div style={{ fontWeight:700, fontSize:13 }}>{t.offer_game||t.offerGame}</div>
-                      {t.offer_note||t.offerNote&&<div style={{ fontSize:11, color:"var(--muted)", marginTop:3 }}>{t.offer_note||t.offerNote}</div>}
+                      <div style={{ fontWeight:700, fontSize:13 }}>{(t.offer_game||t.offerGame)}</div>
+                      {(t.offer_note||t.offerNote)&&<div style={{ fontSize:11, color:"var(--muted)", marginTop:3 }}>{(t.offer_note||t.offerNote)}</div>}
                     </div>
                     <div className="orb" style={{ fontSize:20, color:"var(--cyan)", textAlign:"center" }}>⟷</div>
                     <div style={{ background:"rgba(0,245,255,0.05)", border:"1px solid rgba(0,245,255,0.2)", padding:10, textAlign:"center" }}>
                       <div className="mono" style={{ fontSize:8, color:"var(--cyan)", letterSpacing:1, marginBottom:4 }}>WANTS</div>
-                      <div style={{ fontWeight:700, fontSize:13 }}>{t.want_game||t.wantGame}</div>
-                      {t.want_note||t.wantNote&&<div style={{ fontSize:11, color:"var(--muted)", marginTop:3 }}>{t.want_note||t.wantNote}</div>}
+                      <div style={{ fontWeight:700, fontSize:13 }}>{(t.want_game||t.wantGame)}</div>
+                      {(t.want_note||t.wantNote)&&<div style={{ fontSize:11, color:"var(--muted)", marginTop:3 }}>{(t.want_note||t.wantNote)}</div>}
                     </div>
                   </div>
 
@@ -280,7 +280,7 @@ export default function TradeCenter({ sg, eg, user, setNotify }) {
               <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:10 }}>
                 <div style={{ display:"flex", gap:8, alignItems:"center" }}>
                   <span className="orb" style={{ fontSize:13, color:"var(--purple)" }}>
-                    {t.offer_game||t.offerGame} ⟷ {t.want_game||t.wantGame}
+                    {(t.offer_game||t.offerGame)} ⟷ {(t.want_game||t.wantGame)}
                   </span>
                   <span className="mono" style={{ fontSize:9, padding:"2px 7px",
                     color: t.status==="completed"?"var(--green)":t.status==="cancelled"?"var(--orange)":"var(--cyan)",

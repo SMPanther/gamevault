@@ -4,7 +4,7 @@ import { fmt, calcSteam, calcEpic } from "../utils/helpers";
 import { Sparkline } from "../components/Charts";
 import AccountDetail from "./AccountDetail";
 import { logActivity } from "../utils/storage";
-import { sbGetListings, sbUpsertListing, sbDeleteListing, sbUpdateListingOffers, subscribeListings } from "../utils/supabase";
+import { sbGetListings, sbUpdateListingOffers, subscribeListings } from "../utils/supabase";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Supabase-backed listings — realtime sync across all users
@@ -25,6 +25,7 @@ function useListingsStore() {
 // Market — two sections: BUY (browse listings) and SELL (your listings + insights)
 // ─────────────────────────────────────────────────────────────────────────────
 
+// eslint-disable-next-line no-unused-vars
 // ─── Offer action buttons (accept / decline / counter) ───────────────────────
 function OfferActions({ offer, listingId, askPrice, onAccept, onDecline, onCounter }) {
   const [showCounter, setShowCounter] = React.useState(false);
@@ -83,7 +84,7 @@ export default function Market({ sg, eg, sLinked, eLinked, sProf, eProf, setNoti
   const buyVisible = listings
     .filter(l => l.owner_id !== user?.id)
     .filter(l => {
-      const pOk = filterP==="all" || (filterP==="steam"&&l.steam) || (filterP==="epic"&&l.epic);
+      const pOk = filterP==="all" || ((filterP==="steam"&&l.steam) || (filterP==="epic"&&l.epic));
       const vOk = filterV!=="verified" || l.verified;
       return pOk && vOk;
     })
@@ -116,6 +117,7 @@ export default function Market({ sg, eg, sLinked, eLinked, sProf, eProf, setNoti
   };
 
   // Seller counter-offers on a received offer
+  // eslint-disable-next-line no-unused-vars
   const handleCounter = async (listingId, offerId, counterAmt) => {
     const listing = listings.find(l => l.id === listingId);
     if (!listing) return;
@@ -127,6 +129,7 @@ export default function Market({ sg, eg, sLinked, eLinked, sProf, eProf, setNoti
     setNotify({ msg:`Counter-offer of ${fmt(counterAmt)} sent!`, type:"success" });
   };
 
+  // eslint-disable-next-line no-unused-vars
   const handleOfferAction = async (listingId, offerId, action) => {
     const listing = listings.find(l => l.id === listingId);
     if (!listing) return;
@@ -204,8 +207,6 @@ export default function Market({ sg, eg, sLinked, eLinked, sProf, eProf, setNoti
     // Show contact modal with seller details
     setContactModal(listing);
   };
-
-  const Stars = ({n}) => (
     <span style={{color:"var(--orange)",fontSize:12}}>
       {"★".repeat(Math.round(n))}{"☆".repeat(5-Math.round(n))}
     </span>
