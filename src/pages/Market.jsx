@@ -96,7 +96,7 @@ export default function Market({ sg, eg, sLinked, eLinked, sProf, eProf, setNoti
     });
 
   // Handle offer from either list or detail view
-  const handleOffer = (listing, amount, buyerEmail) => {
+  const handleOffer = async (listing, amount, buyerEmail) => {
     const offer = {
       id:         Date.now(),
       amount,
@@ -116,28 +116,30 @@ export default function Market({ sg, eg, sLinked, eLinked, sProf, eProf, setNoti
   };
 
   // Seller counter-offers on a received offer
-  const handleCounter = (listingId, offerId, counterAmt) => {
-    setListings(p => p.map(l => {
-      if (l.id !== listingId) return l;
-      return { ...l, offers: (l.offers||[]).map(o =>
-        o.id === offerId ? { ...o, status:"countered", counter: counterAmt } : o
-      )};
-    }));
+  const handleCounter = async (listingId, offerId, counterAmt) => {
+    const listing = listings.find(l => l.id === listingId);
+    if (!listing) return;
+    const updatedOffers = (listing.offers||[]).map(o =>
+      o.id === offerId ? { ...o, status:"countered", counter: counterAmt } : o
+    );
+    await sbUpdateListingOffers(listingId, updatedOffers);
+    sbGetListings().then(data => setListings(data || []));
     setNotify({ msg:`Counter-offer of ${fmt(counterAmt)} sent!`, type:"success" });
   };
 
-  const handleOfferAction = (listingId, offerId, action) => {
-    setListings(p => p.map(l => {
-      if (l.id !== listingId) return l;
-      return { ...l, offers: (l.offers||[]).map(o =>
-        o.id === offerId ? { ...o, status: action } : o
-      )};
-    }));
+  const handleOfferAction = async (listingId, offerId, action) => {
+    const listing = listings.find(l => l.id === listingId);
+    if (!listing) return;
+    const updatedOffers = (listing.offers||[]).map(o =>
+      o.id === offerId ? { ...o, status: action } : o
+    );
+    await sbUpdateListingOffers(listingId, updatedOffers);
+    sbGetListings().then(data => setListings(data || []));
     setNotify({ msg: action === "accepted" ? "Offer accepted!" : "Offer declined", type:"success" });
   };
 
   // Post or update a listing
-  const doList = () => {
+  const doList = async () => {
     if (!sLinked&&!eLinked){ setNotify({msg:"Link at least one account first",type:"error"}); return; }
     if (!sellForm.askPrice){ setNotify({msg:"Enter asking price",type:"error"}); return; }
     // Email comes from registration — no need to ask again

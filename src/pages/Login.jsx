@@ -1,6 +1,7 @@
 import { useState, useRef } from "react";
 import { pwStr } from "../utils/helpers";
 import { sbRegister, sbLogin, sbGetProfile, sbCheckUsername, supabase } from "../utils/supabase";
+import { resetPassword } from "../constants/auth";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // EmailJS OTP Verification
@@ -348,7 +349,7 @@ export default function Login({ onLogin }) {
             </div>}
 
             <button className="btn g full" onClick={doSendOTP}
-              disabled={otpSending||emailStatus!=="ok"||!rName||!rUser||!rPw||!rCode||pw.score<2||usernameTaken(rUser)}>
+              disabled={otpSending||emailStatus!=="ok"||!rName||!rUser||!rPw||!rCode||pw.score<2}>
               {otpSending
                 ? <span style={{display:"flex",alignItems:"center",justifyContent:"center",gap:8}}>
                     <span className="spinner" style={{borderColor:"var(--green)",borderTopColor:"transparent"}}/>

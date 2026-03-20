@@ -39,7 +39,7 @@ export default function TradeCenter({ sg, eg, user, setNotify }) {
       t.seller.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
-  const postTrade = () => {
+  const postTrade = async () => {
     if (!form.offerGame.trim()) { setNotify({ msg:"Enter what you're offering", type:"error" }); return; }
     if (!form.wantGame.trim())  { setNotify({ msg:"Enter what you want in return", type:"error" }); return; }
     const id = `tr${Date.now()}`;
@@ -57,7 +57,7 @@ export default function TradeCenter({ sg, eg, user, setNotify }) {
     setSection("browse");
   };
 
-  const proposeSwap = () => {
+  const proposeSwap = async () => {
     if (!swapForm.game.trim()) { setNotify({ msg:"Enter what you're offering", type:"error" }); return; }
     const trade = ts.find(t => t.id === tradeModal.id);
     if (!trade) return;
@@ -75,7 +75,7 @@ export default function TradeCenter({ sg, eg, user, setNotify }) {
     setNotify({ msg:"Trade proposal sent!", type:"success" });
   };
 
-  const markComplete = (id) => {
+  const markComplete = async (id) => {
     await sbUpdateTradeProposals(id, [], "completed");
     sbGetTrades().then(data => setTrades(data || []));
     setNotify({ msg:"Trade marked as completed!", type:"success" });
