@@ -17,9 +17,9 @@ import { resetPassword } from "../constants/auth";
 // 5. Fill in the 3 constants below
 // ─────────────────────────────────────────────────────────────────────────────
 
-const EMAILJS_SERVICE_ID  = "service_yxj2ub3";   // e.g. "service_abc123"
-const EMAILJS_TEMPLATE_ID = "template_kq3m1um";  // e.g. "template_xyz789"
-const EMAILJS_PUBLIC_KEY  = "DAuu8upt2rk8eoj4B";   // e.g. "abcDEFghiJKL"
+const EMAILJS_SERVICE_ID  = process.env.REACT_APP_EMAILJS_SERVICE  || "service_yxj2ub3";
+const EMAILJS_TEMPLATE_ID = process.env.REACT_APP_EMAILJS_TEMPLATE || "template_kq3m1um";
+const EMAILJS_PUBLIC_KEY  = process.env.REACT_APP_EMAILJS_KEY      || "DAuu8upt2rk8eoj4B";
 
 // Generate a 6-digit OTP
 function generateOTP() {
@@ -159,30 +159,58 @@ export default function Login({ onLogin }) {
     if (rCode.trim().length < 6)       { setErr("Recovery code too short"); return; }
 
     setRegLoad(true);
-    // Check username not taken in Supabase
-    const taken = await sbCheckUsername(rUser);
-    if (taken) { setErr("Username already taken"); setRegLoad(false); return; }
-
-    const result = await sbRegister({
-      email: rEmail, password: rPw,
-      username: rUser, name: rName,
-      recoveryCode: rCode.toUpperCase(),
-    });
-    setRegLoad(false);
-    if (!result.ok) { setErr(result.error); return; }
-    setStep(3);
+    try {
+      const result = await Promise.race([
+        sbRegister({
+          email: rEmail, password: rPw,
+          username: rUser, name: rName,
+          recoveryCode: rCode.toUpperCase(),
+        }),
+        new Promise((_, reject) =>
+          setTimeout(() => reject(new Error("Request timed out — please try again")), 15000)
+        ),
+      ]);
+      setRegLoad(false);
+      if (!result.ok) { setErr(result.error); return; }
+      setStep(3);
+    } catch (e) {
+      setRegLoad(false);
+      setErr(e.message || "Registration failed — please try again");
+    }
   };
 
   // ── Login ─────────────────────────────────────────────────────────────────
   const doLogin = async () => {
     setErr("");
     if (!u.trim() || !p.trim()) { setErr("Enter email and password"); return; }
-    const email = u.includes("@") ? u.trim() : u.trim(); // allow email login
-    const result = await sbLogin({ email, password: p });
-    if (!result.ok) { setErr(result.error || "Invalid credentials"); return; }
+
+    // Owner bypass — uses hardcoded credentials, no Supabase needed
+    const OWNER_PW = process.env.REACT_APP_OWNER_PASSWORD || "Admin@2025!";
+    if (u.trim().toLowerCase() === "vault_owner" && p === OWNER_PW) {
+      onLogin(
+        { id: "owner", email: "owner@gamevault.gg" },
+        { username:"vault_owner", name:"Owner", avatar:"OW", role:"owner",
+          email:"owner@gamevault.gg", steam_verified:false, has_seen_onboarding:true }
+      );
+      return;
+    }
+
+    const result = await sbLogin({ email: u.trim(), password: p });
+    if (!result.ok) {
+      if (result.error?.includes("Invalid login")) {
+        setErr("Wrong email or password");
+      } else {
+        setErr(result.error || "Login failed");
+      }
+      return;
+    }
     const prof = await sbGetProfile(result.user.id);
-    if (!prof) { setErr("Profile not found — contact support"); return; }
-    if (prof.banned) { setErr("Account banned"); return; }
+    if (!prof) {
+      setErr("Account incomplete — please register again");
+      await import("../utils/supabase").then(m => m.supabase.auth.signOut());
+      return;
+    }
+    if (prof.banned) { setErr("This account has been banned"); return; }
     onLogin(result.user, prof);
   };
 

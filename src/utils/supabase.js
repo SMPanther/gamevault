@@ -3,8 +3,8 @@
 // ─────────────────────────────────────────────────────────────────────────────
 import { createClient } from "@supabase/supabase-js";
 
-const SUPABASE_URL  = "https://guurupcyzwuwnqmwyiav.supabase.co";
-const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd1dXJ1cGN5end1d25xbXd5aWF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5MzkzNTAsImV4cCI6MjA4OTUxNTM1MH0.tayJ2XY5kEthEBPe1KjyiFeDnKJRLWFrPrsEYm1GRSA";
+const SUPABASE_URL  = process.env.REACT_APP_SUPABASE_URL  || "https://guurupcyzwuwnqmwyiav.supabase.co";
+const SUPABASE_ANON = process.env.REACT_APP_SUPABASE_ANON || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd1dXJ1cGN5end1d25xbXd5aWF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5MzkzNTAsImV4cCI6MjA4OTUxNTM1MH0.tayJ2XY5kEthEBPe1KjyiFeDnKJRLWFrPrsEYm1GRSA";
 
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON);
 
@@ -13,25 +13,42 @@ export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON);
 // ─────────────────────────────────────────────────────────────────────────────
 
 export async function sbRegister({ email, password, username, name, recoveryCode }) {
-  // 1. Create auth user
+  // 1. Check if username already taken before creating auth user
+  const taken = await sbCheckUsername(username);
+  if (taken) return { ok: false, error: "Username already taken" };
+
+  // 2. Create auth user
   const { data, error } = await supabase.auth.signUp({ email, password });
-  if (error) return { ok: false, error: error.message };
+  if (error) {
+    // "User already registered" — auth user exists but maybe no profile
+    if (error.message?.includes("already registered")) {
+      return { ok: false, error: "Email already registered. Try signing in instead." };
+    }
+    return { ok: false, error: error.message };
+  }
 
   const uid = data.user?.id;
-  if (!uid) return { ok: false, error: "Registration failed" };
+  if (!uid) return { ok: false, error: "Registration failed — please try again" };
 
-  // 2. Create profile row
+  // 3. Create profile row
   const { error: pErr } = await supabase.from("profiles").insert({
     id:                  uid,
     username:            username.toLowerCase(),
     name,
+    email:               email.toLowerCase(),
     avatar:              name.slice(0, 2).toUpperCase(),
     role:                "user",
     steam_verified:      false,
     has_seen_onboarding: false,
     recovery_code:       recoveryCode.toUpperCase(),
+    banned:              false,
   });
-  if (pErr) return { ok: false, error: pErr.message };
+
+  if (pErr) {
+    // Profile creation failed — sign out so user can retry cleanly
+    await supabase.auth.signOut();
+    return { ok: false, error: "Profile creation failed: " + pErr.message };
+  }
 
   return { ok: true, user: { id: uid, email, username: username.toLowerCase(), name, role: "user" } };
 }
