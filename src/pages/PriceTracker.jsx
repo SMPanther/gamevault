@@ -75,6 +75,7 @@ export default function PriceTracker({ sg = [] }) {
   const [searching,  setSearching]  = useState(false);
   const [refreshing, setRefreshing] = useState(null);
   const [expanded,   setExpanded]   = useState(null);
+  const [searchErr,  setSearchErr]  = useState("");
 
   const saveTracked = (list) => { setTracked(list); lsSet("price_tracked", list); };
 
@@ -87,8 +88,8 @@ export default function PriceTracker({ sg = [] }) {
     try {
       const r = await searchSteamGame(search);
       setResults(r);
-      if (!r.length) setErr("No games found — try a different name");
-    } catch (e) { setErr("Search failed — check your connection"); setResults([]); }
+      if (!r.length) setSearchErr("No games found — try a different name"); else setSearchErr("");
+    } catch (e) { setSearchErr("Search failed — check your connection"); setResults([]); }
     setSearching(false);
   };
 
@@ -150,6 +151,9 @@ export default function PriceTracker({ sg = [] }) {
             {searching ? <span className="spinner" style={{ width:12, height:12 }}/> : "SEARCH"}
           </button>
         </div>
+        {searchErr && (
+          <div className="mono" style={{color:"var(--orange)",fontSize:11,marginTop:6}}>⚠ {searchErr}</div>
+        )}
         {results.length > 0 && (
           <div style={{ marginTop:8, display:"flex", flexDirection:"column", gap:6 }}>
             {results.map(g => (
