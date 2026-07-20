@@ -301,7 +301,23 @@ export default function Login({ onLogin }) {
             </label>
             <button className="btn full" onClick={doLogin}>⟶ ACCESS VAULT</button>
             <div className="mono" style={{textAlign:"center",fontSize:9,color:"var(--muted)"}}>
-              DEMO: <span style={{color:"var(--cyan)"}}>demo</span> / <span style={{color:"var(--cyan)"}}>demo123</span>
+              <div style={{display:"flex",gap:8,justifyContent:"center",flexWrap:"wrap"}}>
+                <button onClick={()=>{setU("demo@gamevault.gg");setP("demo123");}}
+                  style={{background:"rgba(0,245,255,0.08)",border:"1px solid rgba(0,245,255,0.3)",
+                    color:"var(--cyan)",fontFamily:"Share Tech Mono",fontSize:9,padding:"5px 12px",
+                    cursor:"pointer",letterSpacing:1}}>
+                  👤 DEMO USER
+                </button>
+                <button onClick={()=>{setU("vault_owner");setP("Admin@2025!");}}
+                  style={{background:"rgba(191,0,255,0.08)",border:"1px solid rgba(191,0,255,0.3)",
+                    color:"var(--purple)",fontFamily:"Share Tech Mono",fontSize:9,padding:"5px 12px",
+                    cursor:"pointer",letterSpacing:1}}>
+                  👑 DEMO ADMIN
+                </button>
+              </div>
+              <div className="mono" style={{textAlign:"center",fontSize:8,color:"var(--muted)"}}>
+                Click to auto-fill credentials
+              </div>
             </div>
           </div>
         )}
