@@ -181,17 +181,23 @@ export default function App() {
 
   // ── Logout ────────────────────────────────────────────────────────────────
   const handleLogout = async () => {
-    if (user?.id) {
-      await sbSaveGameState(user.id, {
-        sg, eg, sLinked, eLinked, sProf, eProf, wishExtras,
-      });
-      logActivity(profile?.username, "logout", "Signed out");
+    try {
+      // Only save game state for real users (not owner bypass)
+      if (user?.id && user.id !== "owner") {
+        await sbSaveGameState(user.id, {
+          sg, eg, sLinked, eLinked, sProf, eProf, wishExtras,
+        });
+        logActivity(profile?.username, "logout", "Signed out");
+      }
+      await supabase.auth.signOut();
+    } catch (e) {
+      console.warn("Logout cleanup error:", e);
+    } finally {
+      setUser(null);
+      setProfile(null);
+      setUState(freshUserState());
+      setNotify(null);
     }
-    await supabase.auth.signOut();
-    setUser(null);
-    setProfile(null);
-    setUState(freshUserState());
-    setNotify(null);
   };
 
   // ── User update (display name, avatar) ────────────────────────────────────
